@@ -1,0 +1,28 @@
+# Secrets and machine-local configuration
+.env
+.env.*
+!.env.example
+rails/.env
+rails/config/master.key
+
+# Runtime and generated files
+rails/log/*
+!rails/log/.keep
+rails/tmp/*
+!rails/tmp/.keep
+rails/storage/*
+!rails/storage/.keep
+rails/.ruby-lsp/
+python/app/**/__pycache__/
+*.py[cod]
+*.log
+*.bak*
+
+# Local database exports and Docker persistent data
+backup/*.sql
+mysql/data/
+
+# Editor and OS files
+.DS_Store
+.idea/
+.vscode/

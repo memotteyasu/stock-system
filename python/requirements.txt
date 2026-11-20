@@ -1,0 +1,9 @@
+yfinance
+pandas
+numpy
+SQLAlchemy
+PyMySQL
+python-dotenv
+requests
+openpyxl
+exchange_calendars

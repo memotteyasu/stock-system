@@ -1,0 +1,37 @@
+
+<div style="max-width:1100px;margin:40px auto;padding:20px;font-family:sans-serif;">
+  <p><%= link_to "← ダッシュボードに戻る", root_path %></p>
+
+  <h1><%= @run.stock_job.name %></h1>
+  <h2>実行履歴 #<%= @run.id %></h2>
+
+  <p>状態：<strong><%= @run.status %></strong></p>
+  <p>開始日時：<%= @run.started_at || "-" %></p>
+  <p>終了日時：<%= @run.finished_at || "-" %></p>
+  <p>成功件数：<%= @run.success_count %></p>
+  <p>エラー件数：<%= @run.error_count %></p>
+  <p>最終銘柄：<%= @run.last_stock_code || "-" %></p>
+
+  <h2>実行ログ（最新200件）</h2>
+
+  <table style="width:100%;border-collapse:collapse;">
+    <thead>
+      <tr style="background:#f5f5f5;">
+        <th>日時</th>
+        <th>レベル</th>
+        <th>銘柄</th>
+        <th>内容</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @logs.each do |log| %>
+        <tr style="border-bottom:1px solid #ddd;">
+          <td style="padding:10px;"><%= log.created_at&.strftime("%Y/%m/%d %H:%M:%S") %></td>
+          <td style="padding:10px;"><%= log.level %></td>
+          <td style="padding:10px;"><%= log.stock_code || "-" %></td>
+          <td style="padding:10px;"><%= log.message %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

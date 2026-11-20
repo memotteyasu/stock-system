@@ -1,0 +1,64 @@
+services:
+  python:
+    build:
+      context: ./python
+    container_name: stock_python
+    working_dir: /app
+    volumes:
+      - ./python/app:/app
+    env_file:
+      - .env
+    depends_on:
+      mysql:
+        condition: service_healthy
+    command: sleep infinity
+
+  mysql:
+    image: mysql:8.4
+    container_name: stock_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: stock_system
+      MYSQL_USER: stockuser
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - stock_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  rails:
+    build:
+      context: ./rails
+    container_name: stock_rails
+    working_dir: /app
+    volumes:
+      - ./rails:/app
+    env_file:
+      - ./rails/.env
+    environment:
+      RAILS_ENV: development
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    command: bin/rails server -b 0.0.0.0
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: stock_phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8081:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+    depends_on:
+      mysql:
+        condition: service_healthy
+volumes:
+  stock_mysql_data:
