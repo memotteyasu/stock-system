@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_11_22_090000) do
+ActiveRecord::Schema[7.2].define(version: 2026_11_22_093000) do
   create_table "daily_prices", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "stock_id", null: false
     t.date "trade_date", null: false
@@ -60,6 +60,9 @@ ActiveRecord::Schema[7.2].define(version: 2026_11_22_090000) do
     t.text "error_message"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "worker_pid"
+    t.datetime "worker_started_at"
+    t.datetime "worker_finished_at"
     t.index ["status", "requested_at"], name: "index_stock_job_launch_requests_on_status_and_requested_at"
     t.index ["stock_job_run_id", "status"], name: "index_stock_job_launch_requests_on_run_and_status"
     t.index ["stock_job_run_id"], name: "index_stock_job_launch_requests_on_stock_job_run_id"

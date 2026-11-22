@@ -5,14 +5,17 @@ After=docker.service network-online.target
 
 [Service]
 Type=simple
-# Use a dedicated VPS user that belongs to the docker group.
-User=stockapp
-WorkingDirectory=/opt/stock-system
-ExecStart=/usr/bin/docker compose -f /opt/stock-system/docker-compose.yml exec -T python python collectors/job_dispatcher.py
-Restart=always
+# stockadmin must belong to the docker group. Do not run this service as root.
+User=stockadmin
+WorkingDirectory=/home/stockadmin/stock-system
+# Run the dispatcher in its own Compose container. Do not use `docker compose exec`:
+# exec can leave the container's child Python process alive after systemd stops the CLI.
+ExecStart=/usr/bin/docker compose -f /home/stockadmin/stock-system/docker-compose.yml up --no-deps --abort-on-container-exit dispatcher
+ExecStop=/usr/bin/docker compose -f /home/stockadmin/stock-system/docker-compose.yml stop -t 45 dispatcher
+Restart=on-failure
 RestartSec=10
-KillSignal=SIGINT
-TimeoutStopSec=30
+KillMode=process
+TimeoutStopSec=60
 
 [Install]
 WantedBy=multi-user.target
