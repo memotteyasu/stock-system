@@ -1,0 +1,18 @@
+[Unit]
+Description=Stock system job dispatcher
+Requires=docker.service
+After=docker.service network-online.target
+
+[Service]
+Type=simple
+# Use a dedicated VPS user that belongs to the docker group.
+User=stockapp
+WorkingDirectory=/opt/stock-system
+ExecStart=/usr/bin/docker compose -f /opt/stock-system/docker-compose.yml exec -T python python collectors/job_dispatcher.py
+Restart=always
+RestartSec=10
+KillSignal=SIGINT
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target

@@ -53,6 +53,24 @@ class DashboardController < ApplicationController
     @recent_job_runs = StockJobRun
       .includes(:stock_job)
       .order(created_at: :desc)
-      .limit(10)      
+      .limit(10)
+
+    recent_run_ids = @recent_job_runs.pluck(:id)
+
+    @item_counts_by_run = StockJobItem
+      .where(stock_job_run_id: recent_run_ids)
+      .group(:stock_job_run_id, :status)
+      .count
+
+    @queued_run_ids = StockJobLaunchRequest
+      .where(stock_job_run_id: recent_run_ids)
+      .where(status: %w[pending dispatching])
+      .distinct
+      .pluck(:stock_job_run_id)
+
+    @active_daily_run = StockJobRun
+      .joins(:stock_job)
+      .active
+      .find_by(stock_jobs: { job_key: StockJob::DAILY_UPDATE_KEY })
   end
 end

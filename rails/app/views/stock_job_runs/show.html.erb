@@ -10,7 +10,45 @@
   <p>終了日時：<%= @run.finished_at || "-" %></p>
   <p>成功件数：<%= @run.success_count %></p>
   <p>エラー件数：<%= @run.error_count %></p>
+  <p>未処理件数：<%= @item_counts.fetch("pending", 0) %></p>
   <p>最終銘柄：<%= @run.last_stock_code || "-" %></p>
+
+  <% if @queued_for_launch %>
+    <p style="color:#8a5a00;">このジョブは起動待ちです。</p>
+  <% elsif @run.status.in?(%w[failed stopped]) %>
+    <%= button_to "このジョブを再開", resume_stock_job_run_path(@run), method: :post, data: { turbo_confirm: "未処理・再試行可能な銘柄を再開します。よろしいですか？" } %>
+  <% end %>
+
+  <h2>銘柄別進捗</h2>
+  <ul>
+    <li>成功：<%= @item_counts.fetch("success", 0) %></li>
+    <li>失敗：<%= @item_counts.fetch("failed", 0) %></li>
+    <li>未処理：<%= @item_counts.fetch("pending", 0) %></li>
+  </ul>
+
+  <% if @failed_items.any? %>
+    <h2>失敗した銘柄（最新100件）</h2>
+    <table style="width:100%;border-collapse:collapse;">
+      <thead>
+        <tr style="background:#f5f5f5;">
+          <th>銘柄</th>
+          <th>試行回数</th>
+          <th>最終処理日時</th>
+          <th>エラー内容</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @failed_items.each do |item| %>
+          <tr style="border-bottom:1px solid #ddd;">
+            <td style="padding:10px;"><%= item.stock.code %> <%= item.stock.name %></td>
+            <td style="padding:10px;"><%= item.attempt_count %></td>
+            <td style="padding:10px;"><%= item.processed_at&.strftime("%Y/%m/%d %H:%M:%S") || "-" %></td>
+            <td style="padding:10px;white-space:pre-wrap;"><%= item.error_message %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% end %>
 
   <h2>実行ログ（最新200件）</h2>
 

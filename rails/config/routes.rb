@@ -13,5 +13,9 @@ Rails.application.routes.draw do
   # root "posts#index"
   root "dashboard#index"
 
-  resources :stock_job_runs, only: [:show]
+  post "daily-update-runs", to: "stock_job_runs#create_daily_update", as: :daily_update_runs
+
+  resources :stock_job_runs, only: [:show] do
+    post :resume, on: :member
+  end
 end

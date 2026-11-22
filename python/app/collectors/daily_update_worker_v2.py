@@ -45,7 +45,7 @@ def resume_run(conn, run_id):
             WHERE r.id = %s
               AND j.job_key = 'daily_update'
               AND j.enabled = 1
-              AND r.status IN ('failed', 'stopped', 'running')
+              AND r.status IN ('pending', 'failed', 'stopped', 'running')
         """, (run_id,))
 
         if cursor.fetchone() is None:
@@ -56,6 +56,7 @@ def resume_run(conn, run_id):
         cursor.execute("""
             UPDATE stock_job_runs
             SET status = 'running',
+                started_at = COALESCE(started_at, UTC_TIMESTAMP(6)),
                 finished_at = NULL,
                 error_message = NULL,
                 updated_at = UTC_TIMESTAMP(6)

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_11_16_060106) do
+ActiveRecord::Schema[7.2].define(version: 2026_11_22_090000) do
   create_table "daily_prices", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "stock_id", null: false
     t.date "trade_date", null: false
@@ -50,6 +50,21 @@ ActiveRecord::Schema[7.2].define(version: 2026_11_16_060106) do
     t.index ["stock_job_run_id"], name: "index_stock_job_items_on_stock_job_run_id"
   end
 
+  create_table "stock_job_launch_requests", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "stock_job_run_id", null: false
+    t.string "request_type", null: false
+    t.string "status", default: "pending", null: false
+    t.datetime "requested_at", null: false
+    t.datetime "dispatched_at"
+    t.datetime "completed_at"
+    t.text "error_message"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["status", "requested_at"], name: "index_stock_job_launch_requests_on_status_and_requested_at"
+    t.index ["stock_job_run_id", "status"], name: "index_stock_job_launch_requests_on_run_and_status"
+    t.index ["stock_job_run_id"], name: "index_stock_job_launch_requests_on_stock_job_run_id"
+  end
+
   create_table "stock_job_logs", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "stock_job_run_id", null: false
     t.string "level", default: "INFO", null: false
@@ -76,6 +91,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_11_16_060106) do
     t.index ["status"], name: "index_stock_job_runs_on_status"
     t.index ["stock_job_id", "created_at"], name: "index_stock_job_runs_on_stock_job_id_and_created_at"
     t.index ["stock_job_id", "target_date"], name: "index_stock_job_runs_on_job_and_target_date"
+    t.index ["stock_job_id", "target_date"], name: "index_stock_job_runs_on_unique_job_and_target_date", unique: true
     t.index ["stock_job_id"], name: "index_stock_job_runs_on_stock_job_id"
   end
 
@@ -103,6 +119,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_11_16_060106) do
   add_foreign_key "stock_fetch_status", "stocks", name: "fk_fetch_stock"
   add_foreign_key "stock_job_items", "stock_job_runs"
   add_foreign_key "stock_job_items", "stocks"
+  add_foreign_key "stock_job_launch_requests", "stock_job_runs"
   add_foreign_key "stock_job_logs", "stock_job_runs"
   add_foreign_key "stock_job_runs", "stock_jobs"
 end

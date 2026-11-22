@@ -17,6 +17,21 @@
   </head>
 
   <body>
+    <header style="background:#132238;color:#fff;box-shadow:0 1px 4px rgba(0,0,0,.2);">
+      <nav style="max-width:1100px;margin:0 auto;padding:0 20px;min-height:60px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
+        <%= link_to "Stock Monitor", root_path, style: "color:#fff;font-size:18px;font-weight:700;text-decoration:none;margin-right:auto;" %>
+        <%= link_to "ダッシュボード", root_path, style: "color:#dbeafe;text-decoration:none;padding:18px 0;" %>
+        <%= link_to "日次更新", root_path(anchor: "daily-update"), style: "color:#dbeafe;text-decoration:none;padding:18px 0;" %>
+        <%= link_to "実行履歴", root_path(anchor: "job-runs"), style: "color:#dbeafe;text-decoration:none;padding:18px 0;" %>
+      </nav>
+    </header>
+
+    <% flash.each do |type, message| %>
+      <% color = type.to_s == "alert" ? "#b42318" : "#198754" %>
+      <p style="max-width:1100px;margin:16px auto;padding:12px 20px;color:<%= color %>;border:1px solid <%= color %>;border-radius:6px;">
+        <%= message %>
+      </p>
+    <% end %>
     <%= yield %>
   </body>
 </html>

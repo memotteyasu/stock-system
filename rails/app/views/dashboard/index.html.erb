@@ -58,7 +58,25 @@
   </tbody>
 </table>
 
-<h2 style="margin-top:40px;">Pythonジョブ管理</h2>
+<h2 id="daily-update" style="margin-top:40px;scroll-margin-top:20px;">Pythonジョブ管理</h2>
+
+<section style="border:1px solid #ddd;border-radius:10px;padding:20px;margin-bottom:20px;">
+  <h3 style="margin-top:0;">日次株価更新</h3>
+  <% if @active_daily_run %>
+    <p>
+      実行待ちまたは実行中です：
+      <%= link_to "実行履歴 ##{@active_daily_run.id}", stock_job_run_path(@active_daily_run) %>
+      （<%= @active_daily_run.status %>）
+    </p>
+  <% else %>
+    <%= form_with url: daily_update_runs_path, method: :post do |form| %>
+      <%= form.label :target_date, "対象日" %>
+      <%= form.date_field :target_date, value: Date.current, required: true %>
+      <%= form.submit "日次更新を開始", data: { turbo_confirm: "対象日の株価更新を起動待ちにします。よろしいですか？" } %>
+    <% end %>
+  <% end %>
+
+</section>
 
 <table style="width:100%;border-collapse:collapse;">
   <thead>
@@ -94,7 +112,7 @@
 </p>
 
 
-<h2 style="margin-top:40px;">最近のジョブ実行履歴</h2>
+<h2 id="job-runs" style="margin-top:40px;scroll-margin-top:20px;">最近のジョブ実行履歴</h2>
 
 <table style="width:100%;border-collapse:collapse;">
   <thead>
@@ -104,7 +122,9 @@
       <th style="padding:12px;">開始日時</th>
       <th style="padding:12px;">成功</th>
       <th style="padding:12px;">エラー</th>
+      <th style="padding:12px;">未処理</th>
       <th style="padding:12px;">最終銘柄</th>
+      <th style="padding:12px;">操作</th>
     </tr>
   </thead>
   <tbody>
@@ -119,7 +139,17 @@
         </td>
         <td style="padding:12px;text-align:center;"><%= run.success_count %></td>
         <td style="padding:12px;text-align:center;"><%= run.error_count %></td>
+        <td style="padding:12px;text-align:center;"><%= @item_counts_by_run.dig(run.id, "pending") || 0 %></td>
         <td style="padding:12px;text-align:center;"><%= run.last_stock_code || "-" %></td>
+        <td style="padding:12px;text-align:center;">
+          <% if @queued_run_ids.include?(run.id) %>
+            起動待ち
+          <% elsif run.status.in?(%w[failed stopped]) %>
+            <%= button_to "再開を要求", resume_stock_job_run_path(run), method: :post, data: { turbo_confirm: "このジョブを再開待ちにします。よろしいですか？" } %>
+          <% else %>
+            -
+          <% end %>
+        </td>
       </tr>
     <% end %>
   </tbody>
