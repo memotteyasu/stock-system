@@ -1,0 +1,9 @@
+[Unit]
+Description=Schedule daily stock update at 18:30 JST
+
+[Timer]
+OnCalendar=*-*-* 18:30:00 Asia/Tokyo
+Persistent=false
+
+[Install]
+WantedBy=timers.target

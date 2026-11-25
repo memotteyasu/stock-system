@@ -1,0 +1,10 @@
+[Unit]
+Description=Enqueue daily stock update
+Requires=docker.service
+After=docker.service network-online.target stock-job-dispatcher.service
+
+[Service]
+Type=oneshot
+User=stockadmin
+WorkingDirectory=/home/stockadmin/stock-system
+ExecStart=/usr/bin/docker compose -f /home/stockadmin/stock-system/docker-compose.yml run --rm --no-deps python python -m collectors.auto_enqueue
